@@ -1,0 +1,83 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!--
+        load char library https://www.chartjs.org/docs/latest/
+        copy paste last version lib https://www.jsdelivr.com/package/npm/chart.js
+    -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+</head>
+
+<body>
+    <!--
+    canvas for the draw graphics on a webpage
+-->
+    <canvas id="chart" width="1000" height="300"></canvas>
+
+    <script>
+        // define axis labels using in the getData function (.push)
+        charIt();
+
+        async function charIt() {
+            // assign to variable so you can address the return objects from the function
+            const data = await getData();
+            const ctx = document.getElementById('chart').getContext('2d');
+
+            const myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.xlabels,
+                    datasets: [{
+                        label: 'Global average temperature',
+                        data: data.ytemps,
+                        fill: false,
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }]
+                }
+            });
+        }
+
+        // data from https://data.giss.nasa.gov/gistemp/
+        // make the function synchrones
+        // set the await feature to await before move on
+        async function getData() {
+            const xlabels = [];
+            const ytemps = [];
+
+
+            const response = await fetch('ZonAnn.Ts+dSST.csv');
+            const data = await response.text();
+            console.log(data);
+
+            // split de data table, means make copy excluding first row (0)
+            const table = data.split('\n').slice(1);
+            // forEach higher level function
+            // defining function (var => {})
+            table.forEach(row => {
+                const columns = row.split(',');
+                const year = columns[0];
+                xlabels.push(year);
+                const temp = columns[1];
+                ytemps.push(temp);
+                console.log(year, temp);
+            })
+            console.log(table);
+            // return object of labels
+            return {
+                xlabels,
+                ytemps
+            };
+
+
+
+        }
+    </script>
+
+</body>
+
+</html>
