@@ -1,0 +1,40 @@
+<!--
+    Following  this playlist:
+    https://www.youtube.com/playlist?list=PLRqwX-V7Uu6YxDKpFzf_2D84p0cyk4T7X
+-->
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <img src="" alt="" id="rainbow" width="480px">
+    <!--
+        JS inside for showing purposes
+        The Blob object represents a blob,
+        which is a file-like object of immutable,
+        raw data; they can be read as text or binary data,
+        or converted into a ReadableStream so its methods can be used for processing the data.
+        catch; to set an error
+    -->
+    <script>
+        console.log('about to fetch a rainbow');
+
+        catchRainbow().catch(error => {
+            console.log('error!')
+            console.error(error)
+        });
+
+        async function catchRainbow() {
+            const response = await fetch('rainbow.jpg');
+            const blob = await response.blob();
+            document.getElementById('rainbow').src = URL.createObjectURL(blob);
+
+        }
+    </script>
+</body>
+
+</html>
