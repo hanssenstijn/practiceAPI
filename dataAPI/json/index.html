@@ -1,0 +1,132 @@
+<html lang="en">
+<!--
+        Api from : https://wheretheiss.at/
+    -->
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!--
+        leaflet js file
+    -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+        integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+        crossorigin="" />
+    <!-- 
+        Make sure you put this AFTER Leaflet's CSS
+     -->
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+        integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+        crossorigin=""></script>
+    <style>
+        #mapid {
+            height: 350px;
+            width: 500px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Where is the ISS?</h1>
+
+    <!--
+        use fetch function to retrieve data into the span using its id
+        document.getElementById('lon').textContent = variable;
+    -->
+    <p>
+        latitude: <span id="lat"></span>°<br />
+        longitude: <span id="lon"></span>°
+    </p>
+
+
+    <div id="mapid"></div>
+    <script>
+        // make a map from the leaflet
+        const mymap = L.map('mapid').setView([0, 0], 1);
+
+        // set marker based on the recieved lat and lon of the satelite
+        // const marker = L.marker([0, 0]).addTo(mymap);
+
+        // make contribution to the openstreetmap
+        const attribution =
+            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+
+        const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+        // assgin both variables to the tilelayer
+        // attribution as to be an object so need inside { }
+        const tiles = L.tileLayer(tileUrl, {
+            attribution
+        });
+        // tiles is tegels
+        tiles.addTo(mymap);
+
+        // Making a marker with a custom icon
+        const issIcon = L.icon({
+            iconUrl: 'iss200.png',
+            iconSize: [50, 32],
+            iconAnchor: [25, 16]
+        });
+        const marker = L.marker([0, 0], {
+            icon: issIcon
+        }).addTo(mymap);
+
+
+        // develop own json file
+        // let pos = {
+        //     lat: -45,
+        //     long: 112
+        // };
+        // console.log(pos);
+
+        // define variable which holds the api url
+        const url = 'https://api.wheretheiss.at/v1/satellites/25544';
+
+        // define variable so we can set if statement for static screen
+        let firstTime = true;
+
+        // define async function
+        async function getISS() {
+            // store in variable the fetched api data, await until finished
+            const response = await fetch(url);
+            // transpose data to json file
+            const data = await response.json();
+            // console.log(data);
+            // console.log(data.latitude);
+            // console.log(data.longitude);
+
+            // can also visualize through storing in constant shortcut
+            // store each variable seperate
+            const {
+                latitude,
+                longitude
+            } = data;
+            // console.log(latitude);
+            // console.log(longitude);
+
+            // set marker coordinates based on the recieved lat & lon
+            marker.setLatLng([latitude, longitude]);
+
+            // define if statement for static map screen
+            if (firstTime){
+                mymap.setView([latitude, longitude],4);
+                firstTime = false;
+            }
+
+            //push data to webpage to the ID element lat
+            // textContent since we need text
+            // toFixed to round the number to certain number of decimals
+            document.getElementById('lat').textContent = latitude.toFixed(3);
+            document.getElementById('lon').textContent = longitude.toFixed(3);
+        }
+
+        // call function
+        getISS();
+        
+        // set intervall when a certain function has to be runned
+        setInterval(getISS, 2000);
+    </script>
+</body>
+
+</html>
